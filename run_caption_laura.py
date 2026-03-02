@@ -28,11 +28,11 @@ MAX_PIXELS = 1280 * 28 * 28
 
 
 TIME_SERIES_CAPTION_PROMPT = r"""
-You are a scientific image analyst.
+You are an image describer.
 
 You are given an image.
 
-Your task is to describe the content in the image in no more than 3 sentences.
+Your task is to describe the image in no more than 3 sentences. Do not perform any interpretation or speculation about the image.
 
 Now generate the description.
 """.strip()
