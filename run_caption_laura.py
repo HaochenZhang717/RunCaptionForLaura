@@ -32,7 +32,7 @@ You are a scientific image analyst.
 
 You are given an image.
 
-Your task is to describe the content in the image.
+Your task is to describe the content in the image in no more than 3 sentences.
 
 Now generate the description.
 """.strip()
