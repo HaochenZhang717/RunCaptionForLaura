@@ -139,6 +139,16 @@ def split_range(total, part_id, num_parts):
     return start, end
 
 
+
+def collect_image_files(folder):
+    exts = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.bmp"]
+    files = []
+    for ext in exts:
+        files.extend(glob.glob(os.path.join(folder, ext)))
+        files.extend(glob.glob(os.path.join(folder, ext.upper())))
+    return sorted(files)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--part_id", type=int, default=0,
@@ -156,7 +166,7 @@ def main():
 
     assert 0 <= args.part_id < args.num_parts, "part_id must be in [0, num_parts)"
 
-    png_files = sorted(glob.glob(os.path.join(args.image_folder, "*.png")))
+    png_files = collect_image_files(args.image_folder)
     total = len(png_files)
 
     start_idx, end_idx = split_range(total, args.part_id, args.num_parts)
