@@ -4,8 +4,8 @@
 # GPU CONFIG
 ############################################
 
-export CUDA_VISIBLE_DEVICES=0
-NUM_GPU=1
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+NUM_GPU=4
 
 ############################################
 # DISTRIBUTED SETTINGS
