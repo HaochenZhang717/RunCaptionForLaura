@@ -5,6 +5,7 @@ import random
 import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
+from peft import LoraConfig, get_peft_model, TaskType
 
 import torch
 import torch.nn as nn
@@ -557,6 +558,29 @@ def main():
     # optional but often helpful for training memory
     model.config.use_cache = False
     model.enable_input_require_grads()
+
+
+
+    lora_config = LoraConfig(
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.05,
+        bias="none",
+        task_type=TaskType.CAUSAL_LM,
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
+    )
+
+    model = get_peft_model(model, lora_config)
+    model.print_trainable_parameters()
+
 
     # -------------------------
     # datasets
