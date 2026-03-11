@@ -478,8 +478,8 @@ class Qwen3VLCollatorForGradDiff:
             text=full_texts,
             images=images,
             padding=True,
-            truncation=True,
-            max_length=self.max_length,
+            # truncation=True,
+            # max_length=self.max_length,
             return_tensors="pt",
         )
 
@@ -488,8 +488,8 @@ class Qwen3VLCollatorForGradDiff:
                 text=prompt_texts,
                 images=images,
                 padding=True,
-                truncation=True,
-                max_length=self.max_length,
+                # truncation=True,
+                # max_length=self.max_length,
                 return_tensors="pt",
             )
 
