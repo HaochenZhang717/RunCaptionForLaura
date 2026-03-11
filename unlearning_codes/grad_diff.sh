@@ -27,7 +27,7 @@ export NCCL_ASYNC_ERROR_HANDLING=1
 # TRANSFORMERS CACHE (optional but recommended)
 ############################################
 
-export HF_HOME=/playpen/haochenz/hf_cache
+export HF_HOME=/playpen-nvme/haochenz/hf_cache
 export TRANSFORMERS_CACHE=$HF_HOME
 export HF_DATASETS_CACHE=$HF_HOME
 
