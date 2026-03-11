@@ -12,7 +12,7 @@ NUM_GPU=4
 ############################################
 
 MASTER_ADDR=127.0.0.1
-MASTER_PORT=29500
+MASTER_PORT=29549
 
 ############################################
 # NCCL SETTINGS (important for stability)
