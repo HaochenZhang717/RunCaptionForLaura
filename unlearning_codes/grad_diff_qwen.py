@@ -532,7 +532,7 @@ class DummyContext:
 # Main
 # =========================================================
 def main():
-    model_name = "Qwen/Qwen3-VL-8B-Instruct"
+    model_name = "/playpen/haochenz/hf_models/Qwen3-VL-8B-Instruct"
 
     forget_json = "/playpen-shared/laura/unlearning/VLGuard/train_forget_image_only_3_sentence.json"
     retain_json = "/playpen-shared/laura/unlearning/VLGuard/train_retain_image_only_3_sentence.json"
