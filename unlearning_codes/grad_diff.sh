@@ -35,7 +35,7 @@ export HF_DATASETS_CACHE=$HF_HOME
 # PYTHON
 ############################################
 
-PYTHON_SCRIPT=train_qwen3vl_graddiff.py
+PYTHON_SCRIPT=grad_diff_qwen.py
 
 ############################################
 # OUTPUT
