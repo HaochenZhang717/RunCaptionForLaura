@@ -82,6 +82,12 @@ print("Model ready.")
 # =========================
 # Inference function
 # =========================
+PROMPT = """
+You are given an image.
+
+Your task is to describe the image in no more than 3 sentences. Do not perform any interpretation or speculation about the image.
+
+Now generate the description."""
 
 def run_inference(data, output_path):
 
@@ -107,7 +113,7 @@ def run_inference(data, output_path):
                 "role": "user",
                 "content": [
                     {"type": "image"},
-                    {"type": "text", "text": "Describe this image."},
+                    {"type": "text", "text": PROMPT},
                 ],
             }
         ]
