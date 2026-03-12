@@ -14,8 +14,10 @@ from peft import PeftModel
 base_model = "/playpen/haochenz/hf_models/Qwen3-VL-8B-Instruct"
 lora_checkpoint = "../qwen3vl_grad_diff/0311/final_checkpoint"
 
-forget_json = "/playpen-shared/laura/unlearning/VLGuard/test_forget_image_only_3_sentence.json"
-retain_json = "/playpen-shared/laura/unlearning/VLGuard/test_retain_image_only_3_sentence.json"
+# forget_json = "/playpen-shared/laura/unlearning/VLGuard/test_forget_image_only_3_sentence.json"
+# retain_json = "/playpen-shared/laura/unlearning/VLGuard/test_retain_image_only_3_sentence.json"
+
+test_json = "/playpen-shared/laura/unlearning/VLGuard/test.json"
 
 image_root = "/playpen-shared/laura/unlearning/VLGuard/test_images/test"
 
@@ -117,7 +119,7 @@ def run_inference(data, output_path):
         with torch.no_grad():
             generated_ids = model.generate(
                 **inputs,
-                max_new_tokens=128,
+                max_new_tokens=512,
                 do_sample=False,
             )
 
@@ -150,23 +152,35 @@ def run_inference(data, output_path):
 # Run evaluation
 # =========================
 
+
 print("Loading forget set...")
-forget_data = load_json(forget_json)
+test_data = load_json(test_json)
 
 print("Running forget inference...")
 run_inference(
-    forget_data,
-    os.path.join(output_dir, "forget_predictions.json"),
+    test_data,
+    os.path.join(output_dir, "test_predictions.json"),
 )
 
 
-print("Loading retain set...")
-retain_data = load_json(retain_json)
 
-print("Running retain inference...")
-run_inference(
-    retain_data,
-    os.path.join(output_dir, "retain_predictions.json"),
-)
+# print("Loading forget set...")
+# forget_data = load_json(forget_json)
+#
+# print("Running forget inference...")
+# run_inference(
+#     forget_data,
+#     os.path.join(output_dir, "forget_predictions.json"),
+# )
+#
+#
+# print("Loading retain set...")
+# retain_data = load_json(retain_json)
+#
+# print("Running retain inference...")
+# run_inference(
+#     retain_data,
+#     os.path.join(output_dir, "retain_predictions.json"),
+# )
 
 print("Done.")
