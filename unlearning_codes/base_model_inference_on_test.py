@@ -12,7 +12,6 @@ from peft import PeftModel
 # =========================
 
 base_model = "/playpen/haochenz/hf_models/Qwen3-VL-8B-Instruct"
-lora_checkpoint = "../qwen3vl_grad_diff/0311/final_checkpoint"
 
 # forget_json = "/playpen-shared/laura/unlearning/VLGuard/test_forget_image_only_3_sentence.json"
 # retain_json = "/playpen-shared/laura/unlearning/VLGuard/test_retain_image_only_3_sentence.json"
@@ -62,16 +61,13 @@ def find_human_and_gpt_text(conversations):
 # =========================
 
 print("Loading processor...")
-processor = AutoProcessor.from_pretrained(lora_checkpoint)
+processor = AutoProcessor.from_pretrained(base_model)
 
 print("Loading base model...")
 model = Qwen3VLForConditionalGeneration.from_pretrained(
     base_model,
     torch_dtype=torch.bfloat16,
 )
-
-print("Loading LoRA weights...")
-model = PeftModel.from_pretrained(model, lora_checkpoint)
 
 model = model.to(device)
 model.eval()
@@ -175,7 +171,7 @@ test_data = load_json(test_json)
 print("Running forget inference...")
 run_inference(
     test_data,
-    os.path.join(output_dir, "test_predictions.json"),
+    os.path.join(output_dir, "base_model_test_predictions.json"),
 )
 
 
@@ -198,5 +194,4 @@ run_inference(
 #     retain_data,
 #     os.path.join(output_dir, "train_retain_predictions.json"),
 # )
-
 print("Done.")
