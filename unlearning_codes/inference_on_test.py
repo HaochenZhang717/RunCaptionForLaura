@@ -12,17 +12,17 @@ from peft import PeftModel
 # =========================
 
 base_model = "/playpen/haochenz/hf_models/Qwen3-VL-8B-Instruct"
-lora_checkpoint = "../qwen3vl_grad_diff/0312/final_checkpoint"
+lora_checkpoint = "../qwen3vl_grad_diff/0311/final_checkpoint"
 
 # forget_json = "/playpen-shared/laura/unlearning/VLGuard/test_forget_image_only_3_sentence.json"
 # retain_json = "/playpen-shared/laura/unlearning/VLGuard/test_retain_image_only_3_sentence.json"
 # forget_json = "/playpen-shared/laura/unlearning/VLGuard/train_forget_image_only_3_sentence.json"
 # retain_json = "/playpen-shared/laura/unlearning/VLGuard/train_retain_image_only_3_sentence.json"
 
-# test_json = "/playpen-shared/laura/unlearning/VLGuard/test.json"
+test_json = "/playpen-shared/laura/unlearning/VLGuard/test.json"
 
-# image_root = "/playpen-shared/laura/unlearning/VLGuard/test_images/test"
-image_root = "/playpen-shared/laura/unlearning/VLGuard/train_images/train"
+image_root = "/playpen-shared/laura/unlearning/VLGuard/test_images/test"
+# image_root = "/playpen-shared/laura/unlearning/VLGuard/train_images/train"
 
 output_dir = "./eval_results"
 os.makedirs(output_dir, exist_ok=True)
@@ -169,34 +169,34 @@ def run_inference(data, output_path):
 # =========================
 
 
-# print("Loading forget set...")
-# test_data = load_json(test_json)
-#
-# print("Running forget inference...")
-# run_inference(
-#     test_data,
-#     os.path.join(output_dir, "test_predictions.json"),
-# )
-
-
-
 print("Loading forget set...")
-forget_data = load_json(forget_json)
+test_data = load_json(test_json)
 
 print("Running forget inference...")
 run_inference(
-    forget_data,
-    os.path.join(output_dir, "train_forget_predictions.json"),
+    test_data,
+    os.path.join(output_dir, "test_predictions.json"),
 )
 
 
-print("Loading retain set...")
-retain_data = load_json(retain_json)
 
-print("Running retain inference...")
-run_inference(
-    retain_data,
-    os.path.join(output_dir, "train_retain_predictions.json"),
-)
+# print("Loading forget set...")
+# forget_data = load_json(forget_json)
+#
+# print("Running forget inference...")
+# run_inference(
+#     forget_data,
+#     os.path.join(output_dir, "train_forget_predictions.json"),
+# )
+#
+#
+# print("Loading retain set...")
+# retain_data = load_json(retain_json)
+#
+# print("Running retain inference...")
+# run_inference(
+#     retain_data,
+#     os.path.join(output_dir, "train_retain_predictions.json"),
+# )
 
 print("Done.")
