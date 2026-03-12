@@ -539,7 +539,7 @@ def main():
     retain_json = "/playpen-shared/laura/unlearning/VLGuard/train_retain_image_only_3_sentence.json"
 
     # very likely images are under this root
-    image_root = "/playpen-shared/laura/unlearning/VLGuard"
+    # image_root = "/playpen-shared/laura/unlearning/VLGuard"
     image_root = "/playpen-shared/laura/unlearning/VLGuard/train_images/train"
 
     output_dir = "../qwen3vl_grad_diff/0311"
