@@ -156,34 +156,34 @@ def run_inference(data, output_path):
 # =========================
 
 
-print("Loading forget set...")
-test_data = load_json(test_json)
-
-print("Running forget inference...")
-run_inference(
-    test_data,
-    os.path.join(output_dir, "test_predictions.json"),
-)
-
-
-
 # print("Loading forget set...")
-# forget_data = load_json(forget_json)
+# test_data = load_json(test_json)
 #
 # print("Running forget inference...")
 # run_inference(
-#     forget_data,
-#     os.path.join(output_dir, "forget_predictions.json"),
+#     test_data,
+#     os.path.join(output_dir, "test_predictions.json"),
 # )
-#
-#
-# print("Loading retain set...")
-# retain_data = load_json(retain_json)
-#
-# print("Running retain inference...")
-# run_inference(
-#     retain_data,
-#     os.path.join(output_dir, "retain_predictions.json"),
-# )
+
+
+
+print("Loading forget set...")
+forget_data = load_json(forget_json)
+
+print("Running forget inference...")
+run_inference(
+    forget_data,
+    os.path.join(output_dir, "train_forget_predictions.json"),
+)
+
+
+print("Loading retain set...")
+retain_data = load_json(retain_json)
+
+print("Running retain inference...")
+run_inference(
+    retain_data,
+    os.path.join(output_dir, "train_retain_predictions.json"),
+)
 
 print("Done.")
