@@ -12,12 +12,12 @@ from peft import PeftModel
 # =========================
 
 base_model = "/playpen/haochenz/hf_models/Qwen3-VL-8B-Instruct"
-lora_checkpoint = "../qwen3vl_grad_diff/0311/final_checkpoint"
+lora_checkpoint = "../qwen3vl_grad_diff/0312/final_checkpoint"
 
 # forget_json = "/playpen-shared/laura/unlearning/VLGuard/test_forget_image_only_3_sentence.json"
 # retain_json = "/playpen-shared/laura/unlearning/VLGuard/test_retain_image_only_3_sentence.json"
-forget_json = "/playpen-shared/laura/unlearning/VLGuard/train_forget_image_only_3_sentence.json"
-retain_json = "/playpen-shared/laura/unlearning/VLGuard/train_retain_image_only_3_sentence.json"
+# forget_json = "/playpen-shared/laura/unlearning/VLGuard/train_forget_image_only_3_sentence.json"
+# retain_json = "/playpen-shared/laura/unlearning/VLGuard/train_retain_image_only_3_sentence.json"
 
 # test_json = "/playpen-shared/laura/unlearning/VLGuard/test.json"
 

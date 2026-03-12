@@ -550,7 +550,7 @@ def main():
     # image_root = "/playpen-shared/laura/unlearning/VLGuard"
     image_root = "/playpen-shared/laura/unlearning/VLGuard/train_images/train"
 
-    output_dir = "../qwen3vl_grad_diff/0311"
+    output_dir = "../qwen3vl_grad_diff/0312"
 
     # -------------------------
     # load model / processor
