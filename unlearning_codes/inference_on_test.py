@@ -91,10 +91,17 @@ def run_inference(data, output_path):
 
         image_path = os.path.join(image_root, item["image"])
 
-        _, gt_caption = find_human_and_gpt_text(item["conversations"])
+        # train json
+        if "conversations" in item:
+            _, gt_caption = find_human_and_gpt_text(item["conversations"])
+
+        # test json
+        else:
+            gt_caption = None
 
         image = Image.open(image_path).convert("RGB")
 
+        # same prompt as training
         messages = [
             {
                 "role": "user",
