@@ -4,7 +4,7 @@
 # GPU CONFIG
 ############################################
 
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=0,1,2,4
 NUM_GPU=1
 
 ############################################
