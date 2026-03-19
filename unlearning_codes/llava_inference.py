@@ -38,10 +38,11 @@ class VLGuardInferDataset:
         question = (question or "").replace("<image>", "").strip()
 
         if self.multimodal:
-            print(f"self.image_root: {self.image_root}")
-            print(f"item['images']: {item['images']}")
-            print(f"item.keys(): {item.keys()}")
-            image_path = os.path.join(self.image_root, item["images"])
+            # print(f"self.image_root: {self.image_root}")
+            # print(f"item['images']: {item['images']}")
+            # print(f"item.keys(): {item.keys()}")
+            # image_path = os.path.join(self.image_root, item["images"])
+            image_path = item["images"][0]
             image = Image.open(image_path).convert("RGB")
 
         return {
