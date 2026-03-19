@@ -27,32 +27,48 @@ class VLGuardInferDataset:
 
     def get_item(self, item):
 
+        # =========================
+        # 1. parse question
+        # =========================
         question = ""
-        image = None
 
-        breakpoint()
-        if "conversations" in item:
-            for turn in item["conversations"]:
-                if turn["from"] == "human":
-                    question = turn["value"]
+        if "messages" in item:
+            for turn in item["messages"]:
+                if turn.get("role") == "user":
+                    question = turn.get("content", "")
+                    break
 
         question = (question or "").replace("<image>", "").strip()
 
-        if self.multimodal:
-            # print(f"self.image_root: {self.image_root}")
-            # print(f"item['images']: {item['images']}")
-            # print(f"item.keys(): {item.keys()}")
-            # image_path = os.path.join(self.image_root, item["images"])
+        # =========================
+        # 2. parse image
+        # =========================
+        image = None
+        image_path = None
+
+        if self.multimodal and "images" in item:
             image_path = item["images"][0]
+
+            # 如果不是绝对路径，用 image_root
+            if self.image_root is not None and not os.path.isabs(image_path):
+                image_path = os.path.join(self.image_root, image_path)
+
             image = Image.open(image_path).convert("RGB")
+
+        # =========================
+        # 3. metadata
+        # =========================
+        meta = item.get("metadata", {})
 
         return {
             "question": question,
             "image": image,
-            "image_name": item.get("image"),
-            "id": item.get("id"),
+            "image_path": image_path,
+            "id": meta.get("id"),
+            "source_index": meta.get("source_index"),
+            "turn_index": meta.get("turn_index"),
+            "safe": meta.get("safe"),
         }
-
 
 # =========================
 # Prompt（完全对齐 training）
@@ -113,7 +129,8 @@ def run_inference(args):
         sample = dataset.get_item(item)
 
         prompt = build_prompt(args.mode, sample["question"])
-
+        print(prompt)
+        breakpoint()
         inputs = processor(
             text=[prompt],
             images=[sample["image"]] if sample["image"] is not None else None,
@@ -141,7 +158,6 @@ def run_inference(args):
             skip_special_tokens=True,
         )[0].strip()
 
-        breakpoint()
         results.append({
             "id": sample["id"],
             "image": sample["image_name"],
