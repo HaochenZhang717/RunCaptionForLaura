@@ -57,3 +57,9 @@ torchrun \
 --master_port=$MASTER_PORT \
 $PYTHON_SCRIPT \
 2>&1 | tee $LOG_FILE
+
+
+
+scp -r haochenz@unites6.cs.unc.edu:/playpen-shared/laura/unlearning/VLGuard/test_images/test/bad_ads/ed926a06-4d80-4e3a-9c22-225c232f3d5c.png /Users/zhc/Downloads/
+scp -r haochenz@unites6.cs.unc.edu:/playpen-shared/laura/unlearning/VLGuard/test_images/test/bad_ads/0245d9d5-eed7-4a4f-935a-fb587071da13.png /Users/zhc/Downloads/
+scp -r haochenz@unites6.cs.unc.edu:/playpen-shared/laura/unlearning/VLGuard/test_images/test/bad_ads/073b8ea5-cc7c-4997-8f42-a75736cac276.png /Users/zhc/Downloads/
