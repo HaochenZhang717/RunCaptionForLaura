@@ -12,7 +12,7 @@ JUDGE_MODEL=Qwen/Qwen3-VL-8B-Instruct
 # MULTIMODAL
 ########################################
 python eval_relevance_qwen3vl.py \
-  --input_json tuned_multimodal.json \
+  --input_json ./outputs/tuned_multimodal.json \
   --output_json ./outputs/tuned_multimodal_eval.json \
   --model_id $JUDGE_MODEL \
   --prompt_variant multimodal \
@@ -25,7 +25,7 @@ python eval_relevance_qwen3vl.py \
 # TEXT ONLY
 ########################################
 python eval_relevance_qwen3vl.py \
-  --input_json tuned_text_only.json \
+  --input_json ./outputs/tuned_text_only.json \
   --output_json ./outputs/tuned_text_only_eval.json \
   --model_id $JUDGE_MODEL \
   --prompt_variant text_only \
@@ -38,7 +38,7 @@ python eval_relevance_qwen3vl.py \
 # IMAGE ONLY
 ########################################
 python eval_relevance_qwen3vl.py \
-  --input_json tuned_image_only.json \
+  --input_json ./outputs/tuned_image_only.json \
   --output_json ./outputs/tuned_image_only_eval.json \
   --model_id $JUDGE_MODEL \
   --prompt_variant image_only \
