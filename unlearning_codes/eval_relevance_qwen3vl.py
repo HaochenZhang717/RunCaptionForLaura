@@ -416,7 +416,7 @@ def evaluate(args: argparse.Namespace) -> Dict[str, Any]:
         image_path = row.get("image")
         resolved_image_path = resolve_image_path_for_eval(image_path, args.input_json)
         upstream_error = row.get("error")
-
+        breakpoint()
         output_item: Dict[str, Any] = {
             "row_index": idx,
             "id": row.get("id"),
