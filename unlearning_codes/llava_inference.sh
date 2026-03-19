@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python llava_infer.py \
+python llava_inference.py \
   --base_model /playpen/haochenz/hf_models/llava \
   --model_path ./ckpt/graddiff_mm \
   --input_json /playpen-shared/laura/unlearning/safety/vlguard_test_qwen_input.json \
@@ -11,7 +11,7 @@ python llava_infer.py \
 
 #!/bin/bash
 
-python llava_infer.py \
+python llava_inference.py \
   --base_model /playpen/haochenz/hf_models/llava \
   --model_path ./ckpt/graddiff_text \
   --input_json /playpen-shared/laura/unlearning/safety/vlguard_test_qwen_input_text_only.json \
@@ -21,7 +21,7 @@ python llava_infer.py \
 
 #!/bin/bash
 
-python llava_infer.py \
+python llava_inference.py \
   --base_model /playpen/haochenz/hf_models/llava \
   --model_path ./ckpt/graddiff_img \
   --input_json /playpen-shared/laura/unlearning/safety/vlguard_test_qwen_captioning.json \
