@@ -3,6 +3,9 @@
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=32
 export CUDA_VISIBLE_DEVICES=2,3,4,5
+export HF_HOME=/playpen/haochenz/hf_cache
+export TRANSFORMERS_CACHE=$HF_HOME
+export HF_DATASETS_CACHE=$HF_HOME
 
 SCRIPT=llava_gd.py
 
