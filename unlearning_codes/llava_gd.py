@@ -418,7 +418,11 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--num_epochs", type=int, default=4)
     parser.add_argument("--dataloader_num_workers", type=int, default=16)
-
+    parser.add_argument(
+        "--allow_multi_worker_collate",
+        action="store_true",
+        help="Allow multi-worker dataloader even if collate uses tokenizer"
+    )
     parser.add_argument("--lr", type=float, default=1e-5)
     parser.add_argument("--weight_decay", type=float, default=0.01)
 
