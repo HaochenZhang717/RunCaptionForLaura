@@ -160,7 +160,7 @@ def run_inference(args):
 
         results.append({
             "id": sample["id"],
-            "image": sample["image_name"],
+            "image_path": sample["image_path"],
             "output": text,
         })
 
