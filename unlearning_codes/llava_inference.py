@@ -38,7 +38,7 @@ class VLGuardInferDataset:
         question = (question or "").replace("<image>", "").strip()
 
         if self.multimodal:
-            image_path = os.path.join(self.image_root, item["image"])
+            image_path = os.path.join(self.image_root, item["images"])
             image = Image.open(image_path).convert("RGB")
 
         return {
