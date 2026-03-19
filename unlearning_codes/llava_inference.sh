@@ -1,4 +1,9 @@
 #!/bin/bash
+export HF_HOME=/playpen/haochenz/hf_cache
+export TRANSFORMERS_CACHE=$HF_HOME
+export HF_DATASETS_CACHE=$HF_HOME
+export CUDA_VISIBLE_DEVICES=1
+
 
 python llava_inference.py \
   --base_model llava-hf/llava-1.5-7b-hf \
