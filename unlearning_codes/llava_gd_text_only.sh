@@ -16,7 +16,10 @@ accelerate launch \
   --vanilla_dir llava-hf/llava-1.5-7b-hf \
   --save_dir ./ckpt/graddiff_text \
   --data_mode text_only \
-  --forget_json VLGuard/train_forget_text_only.json \
-  --retain_json VLGuard/train_retain_text_only.json \
-  --batch_size 1
+  --forget_json "/playpen-shared/laura/unlearning/VLGuard/train_forget_image_only_3_sentence.json" \
+  --retain_json "/playpen-shared/laura/unlearning/VLGuard/train_retain_image_only_3_sentence.json" \
+  --image_root "/playpen-shared/laura/unlearning/VLGuard/train_images/train" \
+  --batch_size 1 \
+  --gamma 1.0 \
+  --retain_loss_weight 1.0
 
