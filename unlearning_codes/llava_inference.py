@@ -129,8 +129,8 @@ def run_inference(args):
         sample = dataset.get_item(item)
 
         prompt = build_prompt(args.mode, sample["question"])
-        print(prompt)
-        breakpoint()
+        # print(prompt)
+        # breakpoint()
         inputs = processor(
             text=[prompt],
             images=[sample["image"]] if sample["image"] is not None else None,
