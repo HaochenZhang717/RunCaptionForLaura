@@ -140,6 +140,7 @@ def run_inference(args):
             skip_special_tokens=True,
         )[0].strip()
 
+        breakpoint()
         results.append({
             "id": sample["id"],
             "image": sample["image_name"],
