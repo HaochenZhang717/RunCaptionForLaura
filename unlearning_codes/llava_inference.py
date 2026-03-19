@@ -30,6 +30,7 @@ class VLGuardInferDataset:
         question = ""
         image = None
 
+        breakpoint()
         if "conversations" in item:
             for turn in item["conversations"]:
                 if turn["from"] == "human":
