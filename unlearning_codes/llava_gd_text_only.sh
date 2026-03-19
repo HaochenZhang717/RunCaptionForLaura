@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=32
 export CUDA_VISIBLE_DEVICES=2,3,4,5
 
-SCRIPT=GradDiff.py
+SCRIPT=llava_gd.py
 
 accelerate launch \
   --num_processes 4 \
