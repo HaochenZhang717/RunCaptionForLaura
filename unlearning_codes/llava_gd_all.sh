@@ -1,0 +1,3 @@
+bash llava_gd_image_only.sh
+bash llava_gd_multimodal_only.sh
+bash llava_gd_text_only.sh
