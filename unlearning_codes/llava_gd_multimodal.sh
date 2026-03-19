@@ -9,8 +9,8 @@ SCRIPT=llava_gd.py
 accelerate launch \
   --num_processes 4 \
   $SCRIPT \
-  --model_id /common/$USER/models/llava-1.5-7b-hf \
-  --vanilla_dir /common/$USER/models/llava-1.5-7b-hf \
+  --model_id llava-hf/llava-1.5-7b-hf \
+  --vanilla_dir llava-hf/llava-1.5-7b-hf \
   --save_dir ./ckpt/graddiff_mm \
   --forget_json VLGuard/train_forget.json \
   --retain_json VLGuard/train_retain.json \
