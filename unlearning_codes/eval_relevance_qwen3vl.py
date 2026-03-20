@@ -411,12 +411,15 @@ def evaluate(args: argparse.Namespace) -> Dict[str, Any]:
         if args.limit > 0 and len(results) >= args.limit:
             break
 
-        question = (row.get("instruction") or "").strip()
-        answer = (row.get("model_response") or "").strip()
-        image_path = row.get("image")
+        # question = (row.get("instruction") or "").strip()
+        # answer = (row.get("model_response") or "").strip()
+        # image_path = row.get("image")
+        question = (row.get("question") or "").strip()
+        answer = (row.get("output") or "").strip()
+        image_path = row.get("image_path")
         resolved_image_path = resolve_image_path_for_eval(image_path, args.input_json)
         upstream_error = row.get("error")
-        breakpoint()
+
         output_item: Dict[str, Any] = {
             "row_index": idx,
             "id": row.get("id"),
