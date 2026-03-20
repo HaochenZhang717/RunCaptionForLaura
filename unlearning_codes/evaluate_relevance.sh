@@ -8,17 +8,7 @@ export CUDA_VISIBLE_DEVICES=6
 
 JUDGE_MODEL=Qwen/Qwen3-VL-8B-Instruct
 
-########################################
-# MULTIMODAL
-########################################
-python eval_relevance_qwen3vl.py \
-  --input_json ./outputs/tuned_multimodal.json \
-  --output_json ./outputs/tuned_multimodal_eval.json \
-  --model_id $JUDGE_MODEL \
-  --prompt_variant multimodal \
-  --device cuda \
-  --dtype auto \
-  --max_new_tokens 256
+
 
 
 ########################################
@@ -42,6 +32,20 @@ python eval_relevance_qwen3vl.py \
   --output_json ./outputs/tuned_image_only_eval.json \
   --model_id $JUDGE_MODEL \
   --prompt_variant image_only \
+  --device cuda \
+  --dtype auto \
+  --max_new_tokens 256
+
+
+
+########################################
+# MULTIMODAL
+########################################
+python eval_relevance_qwen3vl.py \
+  --input_json ./outputs/tuned_multimodal.json \
+  --output_json ./outputs/tuned_multimodal_eval.json \
+  --model_id $JUDGE_MODEL \
+  --prompt_variant multimodal \
   --device cuda \
   --dtype auto \
   --max_new_tokens 256
