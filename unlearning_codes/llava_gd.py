@@ -443,3 +443,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main(args)
+
+    # base model: llava-hf/llava-1.5-7b-hf
+    # Lora: rank-32 alpha-16 lora dropout 0.05
+    # lr: 1e-5
+    # global batch size: 4
+    # weight decay 1e-2
+    # num_epochs: 4
