@@ -1,6 +1,6 @@
 """
 Paraphrase the human-side questions / instructions in the three JSON files
-using an open-source text LLM (default: Qwen2.5-7B-Instruct).
+using an open-source text LLM (default: Qwen2.5-7B).
 
 Input files (all under this directory):
     - test.json
@@ -52,7 +52,7 @@ DEFAULT_FILES = [
     "train_retain.json",
 ]
 
-DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+DEFAULT_MODEL = "Qwen/Qwen2.5-7B"
 
 SYSTEM_PROMPTS = {
     "question": (
@@ -81,7 +81,56 @@ USER_TEMPLATES = {
     "instruction": "Rewrite the following as a single imperative instruction:\n\n{text}",
 }
 
+BASE_PROMPT_TEMPLATES = {
+    "question": (
+        "Task: Rewrite the input as a single interrogative question.\n"
+        "Rules:\n"
+        "- Preserve the original meaning and intent.\n"
+        "- Do not refuse, warn, moralize, or add safety advice.\n"
+        "- Do not add or remove important details.\n"
+        "- Do not change polarity. Keep requests for harmful, illegal, or unsafe actions as requests.\n"
+        "- Output exactly one natural question ending with '?'.\n"
+        "- Output only the rewritten text.\n\n"
+        "Input: {text}\n"
+        "Output:"
+    ),
+    "instruction": (
+        "Task: Rewrite the input as a single imperative instruction.\n"
+        "Rules:\n"
+        "- Preserve the original meaning and intent.\n"
+        "- Do not refuse, warn, moralize, or add safety advice.\n"
+        "- Do not add or remove important details.\n"
+        "- Do not change polarity. Keep requests for harmful, illegal, or unsafe actions as requests.\n"
+        "- Output exactly one imperative instruction.\n"
+        "- Do not end with a question mark.\n"
+        "- Output only the rewritten text.\n\n"
+        "Input: {text}\n"
+        "Output:"
+    ),
+}
+
 IMAGE_TAG = "<image>"
+
+REFUSAL_PATTERNS = [
+    r"\bi cannot\b",
+    r"\bi can't\b",
+    r"\bi can not\b",
+    r"\bi won'?t\b",
+    r"\bi will not\b",
+    r"\bsorry\b",
+    r"\bi am sorry\b",
+    r"\bi'm sorry\b",
+    r"\bdo not\b",
+    r"\bdon't\b",
+    r"\bcannot help\b",
+    r"\bcan'?t help\b",
+    r"\billegal\b",
+    r"\bharmful\b",
+    r"\bunethical\b",
+    r"\bagainst (the )?law\b",
+    r"\bnot able to\b",
+    r"\bnot provide\b",
+]
 
 
 # =========================
@@ -148,6 +197,11 @@ class Paraphraser:
         self.target_form = target_form
         self.system_prompt = SYSTEM_PROMPTS[target_form]
         self.user_template = USER_TEMPLATES[target_form]
+        self.base_prompt_template = BASE_PROMPT_TEMPLATES[target_form]
+        model_name = model_path.lower()
+        self.use_chat_template = any(
+            key in model_name for key in ("instruct", "chat")
+        )
 
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         print(f"Loading tokenizer from {model_path} ...")
@@ -164,6 +218,9 @@ class Paraphraser:
         self.model.eval()
 
     def _build_prompt(self, text: str) -> str:
+        if not self.use_chat_template:
+            return self.base_prompt_template.format(text=text)
+
         messages = [
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": self.user_template.format(text=text)},
@@ -177,8 +234,8 @@ class Paraphraser:
         self,
         texts: List[str],
         max_new_tokens: int = 128,
-        temperature: float = 0.7,
-        top_p: float = 0.9,
+        temperature: float = 0.0,
+        top_p: float = 1.0,
     ) -> List[str]:
         prompts = [self._build_prompt(t) for t in texts]
         enc = self.tokenizer(
@@ -191,14 +248,15 @@ class Paraphraser:
         out = self.model.generate(
             **enc,
             max_new_tokens=max_new_tokens,
-            do_sample=True,
+            do_sample=temperature > 0,
             temperature=temperature,
             top_p=top_p,
             pad_token_id=self.tokenizer.pad_token_id,
         )
         trimmed = out[:, enc["input_ids"].shape[1]:]
         decoded = self.tokenizer.batch_decode(trimmed, skip_special_tokens=True)
-        return [clean_output(d) for d in decoded]
+        return [postprocess_output(clean_output(d), src, self.target_form)
+                for src, d in zip(texts, decoded)]
 
 
 def clean_output(s: str) -> str:
@@ -207,6 +265,34 @@ def clean_output(s: str) -> str:
     if len(s) >= 2 and s[0] == s[-1] and s[0] in ("\"", "'", "“", "”"):
         s = s[1:-1].strip()
     return s
+
+
+def has_refusal_language(text: str) -> bool:
+    lowered = text.strip().lower()
+    return any(re.search(pattern, lowered) for pattern in REFUSAL_PATTERNS)
+
+
+def normalize_output(text: str, target_form: str) -> str:
+    text = " ".join(text.split()).strip()
+    if not text:
+        return text
+
+    if target_form == "question":
+        text = text.rstrip(" .!")
+        if not text.endswith("?"):
+            text += "?"
+    else:
+        text = text.rstrip()
+        if text.endswith("?"):
+            text = text[:-1].rstrip()
+    return text
+
+
+def postprocess_output(output: str, original: str, target_form: str) -> str:
+    output = normalize_output(output, target_form)
+    if not output or has_refusal_language(output):
+        return original
+    return output
 
 
 # =========================
@@ -257,8 +343,8 @@ def main():
                          "Defaults to '_rephrased_<target_form>'.")
     ap.add_argument("--batch_size", type=int, default=8)
     ap.add_argument("--max_new_tokens", type=int, default=128)
-    ap.add_argument("--temperature", type=float, default=0.7)
-    ap.add_argument("--top_p", type=float, default=0.9)
+    ap.add_argument("--temperature", type=float, default=0.0)
+    ap.add_argument("--top_p", type=float, default=1.0)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 

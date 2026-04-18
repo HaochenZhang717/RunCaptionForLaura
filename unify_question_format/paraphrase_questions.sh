@@ -6,7 +6,7 @@ export TRANSFORMERS_CACHE=$HF_HOME
 export HF_DATASETS_CACHE=$HF_HOME
 
 
-MODEL="Qwen/Qwen2.5-7B-Instruct"
+MODEL="Qwen/Qwen2.5-7B"
 
 python paraphrase_questions.py \
   --model "$MODEL" \
@@ -14,8 +14,8 @@ python paraphrase_questions.py \
   --target_form "instruction" \
   --batch_size 1 \
   --max_new_tokens 128 \
-  --temperature 0.7 \
-  --top_p 0.9 \
+  --temperature 0.0 \
+  --top_p 1.0 \
   --seed 0
 
 
@@ -25,6 +25,6 @@ python paraphrase_questions.py \
   --target_form "question" \
   --batch_size 1 \
   --max_new_tokens 128 \
-  --temperature 0.7 \
-  --top_p 0.9 \
+  --temperature 0.0 \
+  --top_p 1.0 \
   --seed 0
