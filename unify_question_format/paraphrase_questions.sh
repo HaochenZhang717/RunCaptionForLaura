@@ -12,7 +12,7 @@ python paraphrase_questions.py \
   --model "$MODEL" \
   --files test.json train_forget.json train_retain.json \
   --target_form "instruction" \
-  --batch_size 64 \
+  --batch_size 1 \
   --max_new_tokens 128 \
   --temperature 0.7 \
   --top_p 0.9 \
@@ -23,7 +23,7 @@ python paraphrase_questions.py \
   --model "$MODEL" \
   --files test.json train_forget.json train_retain.json \
   --target_form "question" \
-  --batch_size 64 \
+  --batch_size 1 \
   --max_new_tokens 128 \
   --temperature 0.7 \
   --top_p 0.9 \
