@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-SCRIPT_DIR="/Users/zhc/Documents/PhD/projects/RunCaptionForLaura/unify_question_format"
+SCRIPT_DIR="/playpen-shared/haochenz/RunCaptionForLaura/unify_question_format"
 cd "$SCRIPT_DIR"
 
 export HF_HOME=/playpen/haochenz/hf_cache
