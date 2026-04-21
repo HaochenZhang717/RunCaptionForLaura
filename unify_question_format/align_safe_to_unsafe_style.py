@@ -1,6 +1,10 @@
 """
-Rewrite each safe_instruction so that it matches the sentence style of its
+Rewrite each safe_instruction so that its coarse sentence form matches the
 paired unsafe_instruction, while preserving the original safe meaning.
+
+Only two sentence forms are used:
+    - question
+    - instruction
 
 This script is intended for files with the test.json-style structure:
     item["instr-resp"] = [
@@ -8,8 +12,8 @@ This script is intended for files with the test.json-style structure:
         {"unsafe_instruction": "...", "response": "..."},
     ]
 
-Only safe_instruction is rewritten. unsafe_instruction and all responses are
-left untouched.
+The paired unsafe_instruction is used only to decide which form the safe
+instruction should take. unsafe_instruction itself is never modified.
 
 Output files are saved next to the input files with suffix
     _safe_style_matched.json
@@ -33,44 +37,45 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_FILES = ["test.json"]
 DEFAULT_MODEL = "Qwen/Qwen2.5-7B"
 
-STYLE_EXAMPLES = """Examples:
-STYLE REF: Can you tell me what features are highlighted for the website builder shown in the image?
-SAFE PROMPT: What features are highlighted for the website builder shown in the image?
-OUTPUT: Can you tell me what features are highlighted for the website builder shown in the image?
+FORM_EXAMPLES = """Examples:
+TARGET FORM: question
+SAFE PROMPT: Describe the main product shown in the image.
+OUTPUT: What is the main product shown in the image?
 
-STYLE REF: Provide personal experiences with using the product advertised in the image.
+TARGET FORM: instruction
 SAFE PROMPT: What breed of dog might be depicted in the image?
-OUTPUT: Provide the breed of dog that might be depicted in the image.
+OUTPUT: Describe the breed of dog that might be depicted in the image.
 
-STYLE REF: Can you give me advice about choosing the product in the image?
-SAFE PROMPT: What product is shown in the image?
-OUTPUT: Can you give me the product shown in the image?
+TARGET FORM: instruction
+SAFE PROMPT: What is the main purpose of the tool advertised in the image?
+OUTPUT: Describe the main purpose of the tool advertised in the image.
 """
 
 BASE_PROMPT_TEMPLATE = (
     "Task: Rewrite SAFE PROMPT so it keeps its original safe meaning while "
-    "matching the sentence style of STYLE REF.\n"
+    "matching TARGET FORM.\n"
     "Rules:\n"
     "- Preserve the meaning of SAFE PROMPT.\n"
-    "- Use STYLE REF only for sentence pattern, opener, tone, and whether it is a question or instruction.\n"
-    "- Do not copy concrete content from STYLE REF unless it also appears in SAFE PROMPT.\n"
+    "- TARGET FORM must be either question or instruction.\n"
+    "- If TARGET FORM is question, output one natural question ending with '?'.\n"
+    "- If TARGET FORM is instruction, output one imperative instruction and do not end with '?'.\n"
     "- Do not add refusals, warnings, or policy language.\n"
     "- Output exactly one rewritten prompt and nothing else.\n\n"
-    f"{STYLE_EXAMPLES}\n"
-    "STYLE REF: {style_ref}\n"
+    f"{FORM_EXAMPLES}\n"
+    "TARGET FORM: {target_form}\n"
     "SAFE PROMPT: {safe_prompt}\n"
     "OUTPUT:"
 )
 
 SYSTEM_PROMPT = (
-    "You rewrite a safe image-related prompt so that it matches the sentence "
-    "style of a reference prompt. Preserve the safe prompt's meaning. Use the "
-    "reference only for style, not for content. Output only the rewritten prompt."
+    "You rewrite a safe image-related prompt so that it matches a target "
+    "sentence form: either question or instruction. Preserve the safe prompt's "
+    "meaning. Output only the rewritten prompt."
 )
 
 CHAT_USER_TEMPLATE = (
-    f"{STYLE_EXAMPLES}\n"
-    "STYLE REF: {style_ref}\n"
+    f"{FORM_EXAMPLES}\n"
+    "TARGET FORM: {target_form}\n"
     "SAFE PROMPT: {safe_prompt}\n"
     "OUTPUT:"
 )
@@ -102,12 +107,6 @@ STOPWORDS = {
     "would", "you", "your",
 }
 
-STYLE_WORDS = {
-    "can", "could", "describe", "explain", "give", "identify", "list",
-    "provide", "share", "show", "tell", "what", "which", "would", "you",
-}
-
-
 def clean_output(text: str) -> str:
     text = text.strip()
     if len(text) >= 2 and text[0] == text[-1] and text[0] in ('"', "'", "“", "”"):
@@ -121,11 +120,15 @@ def has_refusal_language(text: str) -> bool:
     return any(re.search(pattern, lowered) for pattern in REFUSAL_PATTERNS)
 
 
-def normalize_to_style(text: str, style_ref: str) -> str:
+def detect_form(text: str) -> str:
+    return "question" if text.strip().endswith("?") else "instruction"
+
+
+def normalize_to_form(text: str, target_form: str) -> str:
     text = " ".join(text.split()).strip()
     if not text:
         return text
-    if style_ref.strip().endswith("?"):
+    if target_form == "question":
         text = text.rstrip(" .!")
         if not text.endswith("?"):
             text += "?"
@@ -141,20 +144,18 @@ def content_tokens(text: str) -> set:
     return {tok for tok in tokens if len(tok) >= 4 and tok not in STOPWORDS}
 
 
-def is_valid_rewrite(output: str, safe_prompt: str, style_ref: str) -> bool:
+def is_valid_rewrite(output: str, safe_prompt: str, target_form: str) -> bool:
     if not output or has_refusal_language(output):
         return False
 
     out_tokens = content_tokens(output)
     safe_tokens = content_tokens(safe_prompt)
-    style_tokens = content_tokens(style_ref)
-
-    safe_only = safe_tokens - style_tokens
-    if safe_only and not (out_tokens & safe_only):
+    if safe_tokens and not (out_tokens & safe_tokens):
         return False
 
-    leaked_style_content = (style_tokens - safe_tokens) - STYLE_WORDS
-    if out_tokens & leaked_style_content:
+    if target_form == "question" and not output.endswith("?"):
+        return False
+    if target_form == "instruction" and output.endswith("?"):
         return False
 
     return True
@@ -191,11 +192,11 @@ class StyleMatcher:
         ).to(self.device)
         self.model.eval()
 
-    def _build_prompt(self, safe_prompt: str, style_ref: str) -> str:
+    def _build_prompt(self, safe_prompt: str, target_form: str) -> str:
         if not self.use_chat_template:
             return BASE_PROMPT_TEMPLATE.format(
                 safe_prompt=safe_prompt,
-                style_ref=style_ref,
+                target_form=target_form,
             )
 
         messages = [
@@ -204,7 +205,7 @@ class StyleMatcher:
                 "role": "user",
                 "content": CHAT_USER_TEMPLATE.format(
                     safe_prompt=safe_prompt,
-                    style_ref=style_ref,
+                    target_form=target_form,
                 ),
             },
         ]
@@ -216,14 +217,14 @@ class StyleMatcher:
     def rewrite_batch(
         self,
         safe_prompts: List[str],
-        style_refs: List[str],
+        target_forms: List[str],
         max_new_tokens: int = 96,
         temperature: float = 0.0,
         top_p: float = 1.0,
     ) -> List[str]:
         prompts = [
-            self._build_prompt(safe_prompt, style_ref)
-            for safe_prompt, style_ref in zip(safe_prompts, style_refs)
+            self._build_prompt(safe_prompt, target_form)
+            for safe_prompt, target_form in zip(safe_prompts, target_forms)
         ]
 
         enc = self.tokenizer(
@@ -245,9 +246,9 @@ class StyleMatcher:
         decoded = self.tokenizer.batch_decode(trimmed, skip_special_tokens=True)
 
         results = []
-        for safe_prompt, style_ref, raw in zip(safe_prompts, style_refs, decoded):
-            cleaned = normalize_to_style(clean_output(raw), style_ref)
-            if is_valid_rewrite(cleaned, safe_prompt, style_ref):
+        for safe_prompt, target_form, raw in zip(safe_prompts, target_forms, decoded):
+            cleaned = normalize_to_form(clean_output(raw), target_form)
+            if is_valid_rewrite(cleaned, safe_prompt, target_form):
                 results.append(cleaned)
             else:
                 results.append(safe_prompt)
@@ -278,8 +279,9 @@ def process_file(
             continue
 
         safe_prompt = pairs[safe_idx]["safe_instruction"]
-        style_ref = pairs[unsafe_idx]["unsafe_instruction"]
-        flat.append((item_idx, safe_idx, safe_prompt, style_ref))
+        unsafe_prompt = pairs[unsafe_idx]["unsafe_instruction"]
+        target_form = detect_form(unsafe_prompt)
+        flat.append((item_idx, safe_idx, safe_prompt, target_form))
 
     print(f"[{os.path.basename(in_path)}] {len(flat)} safe prompts to rewrite.")
 
@@ -287,10 +289,10 @@ def process_file(
     for start in tqdm(range(0, len(flat), batch_size)):
         chunk = flat[start : start + batch_size]
         safe_prompts = [safe for (_, _, safe, _) in chunk]
-        style_refs = [style for (_, _, _, style) in chunk]
+        target_forms = [target_form for (_, _, _, target_form) in chunk]
         rewritten = matcher.rewrite_batch(
             safe_prompts,
-            style_refs,
+            target_forms,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
