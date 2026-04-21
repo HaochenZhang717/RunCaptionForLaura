@@ -10,6 +10,7 @@ export HF_DATASETS_CACHE="$HF_HOME"
 
 MODEL="${MODEL:-Qwen/Qwen2.5-7B}"
 
+
 python align_safe_to_unsafe_style.py \
   --model "$MODEL" \
   --files test.json \
